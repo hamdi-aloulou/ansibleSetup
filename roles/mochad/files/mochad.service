@@ -1,0 +1,14 @@
+[Unit]
+Description=Mochad X10 Daemon
+Requires=udev.service
+After=udev.service syslog.target network.target staticRouteBuilder.service
+
+[Service]
+Type=forking
+GuessMainPID=yes
+ExecStart=/bin/bash -c 'sleep 5; /usr/local/bin/mochad'
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

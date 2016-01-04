@@ -1,0 +1,135 @@
+---
+- name: Remove unneeded packages.
+  apt:
+    name: "{{ item }}"
+    state: absent
+  sudo: yes
+  with_items:
+    - desktop-base
+    - lightdm
+    - esound-common
+    - freepats
+    - sonic-pi
+    - jackd2
+    - omxplayer
+    - pypy-upstream
+    - oracle-java8-jdk
+    - minecraft-pi
+    - wolfram-engine
+    - libopencv*
+    - python-pifacecommon
+    - python3-pifacecommon
+    - dillo
+    - squeak-vm
+    - squeak-plugins-scratch
+    - netsurf-gtk
+    - netsurf-common
+    - epiphany-browser-data
+    - fonts-droid
+    - gsfonts
+    - man-db
+    - manpages
+
+- name: Ensure certain files and directories are deleted.
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /home/pi/python_games
+    - /home/pi/Desktop
+    - /usr/share/doc/
+    - /usr/share/man/
+    - /opt/vc/src
+    - /usr/share/icons/gnome/icon-theme.cache
+    - /opt/vc/src/hello_pi/hello_video/test.h264
+
+- name: Let's update the apt cache.
+  apt: update_cache=yes
+  sudo: yes
+
+- name: Now we need to update the Raspbian distribution.
+  apt: upgrade=yes
+  sudo: yes
+
+- name: Make sure some basic tools are installed
+  apt: pkg={{ item }} state=latest
+  sudo: yes
+  with_items:
+    - apt-transport-https
+    - apticron
+    - build-essential
+    - debian-goodies
+    - unattended-upgrades
+    - git
+    - curl
+    - htop
+    - iftop
+    - iotop
+    - nmap
+    - tmux
+    - zsh
+    - nmon
+    - rpi-update
+    - haveged
+    - avahi-daemon
+    - rng-tools
+    - vim
+    - mosh
+    - python-software-properties
+    - ruby1.9.3
+    - screen
+    - sudo
+    - update-notifier-common
+
+- name: Uninstall the massive wolfram-alpha engine
+  apt: pkg={{ item }} state=absent
+  sudo: yes
+  with_items:
+    - wolfram-engine
+
+- name: Autoremove any unused packages.
+  shell: "apt-get autoremove --assume-yes --purge"
+  sudo: yes
+
+- name: Let's Autoclean the system.
+  shell: "apt-get autoclean --assume-yes"
+  sudo: yes
+
+- name: Set /etc/localtime to {{ timezone }}
+  copy: src=/usr/share/zoneinfo/{{ timezone }}
+        dest=/etc/localtime
+        owner=root
+        group=root
+        mode=0644
+        backup=yes
+
+- name: Set /etc/timezone to {{ timezone }}
+  template: dest=/etc/timezone src=timezone.j2
+  notify: update tzdata
+
+- name: Apticron email configuration
+  template: src=apticron.conf.j2 dest=/etc/apticron/apticron.conf
+
+- name: Uninstall pip old version.
+  apt: pkg=python-pip state=absent
+
+- name: Get get-pip.py.
+  get_url: url=https://raw.github.com/pypa/pip/master/contrib/get-pip.py dest=/home/{{ user }}
+
+- name: Install pip new version.
+  command: python get-pip.py
+
+- name: Prepare /root/.ssh folder
+  file:
+    path: "/root/.ssh"
+    state: absent
+  file:
+    path: "/root/.ssh/"
+    state: directory
+- name: Copy public and private keys to Raspberry Pi.
+  copy: src={{ item }} dest=/root/.ssh mode=0600
+  with_items:
+    - id_rsa
+    - id_rsa.pub
+
+

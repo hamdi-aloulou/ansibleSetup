@@ -1,0 +1,38 @@
+---
+- name: Get mochad {{mochad_version}} version.
+  get_url: url=http://sourceforge.net/projects/mochad/files/latest/download dest=/home/{{ user }}
+
+- name: Extract mochad from tar.gz archive
+  unarchive: src=/home/{{ user }}/mochad-{{mochad_version}}.tar.gz
+             dest=/home/{{ user }}
+             copy=no
+
+- name: install required package libusb-1.0-0-dev.
+  apt: pkg={{ item }} state=latest
+  sudo: yes
+  with_items:
+    - libusb-1.0-0-dev
+
+- name: Install mochad {{mochad_version}} version.
+  command: sudo {{ item }} chdir="/home/{{ user }}/mochad-{{mochad_version}}"
+  with_items:
+    - ./configure
+    - make
+    - make install
+
+- name: Cleaning up.
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /home/{{user}}/mochad-{{mochad_version}}
+    - /home/{{user}}/mochad-{{mochad_version}}.tar.gz
+
+- name: Copy mochad systemd service
+  copy: src=mochad.service dest=/lib/systemd/system/
+
+- name: enable mochad systemd service
+  command: sudo systemctl {{ item }} mochad.service
+  with_items:
+    - enable
+    - start
