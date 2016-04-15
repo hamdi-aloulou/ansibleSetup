@@ -114,7 +114,7 @@
   apt: pkg=python-pip state=absent
 
 - name: Get get-pip.py.
-  get_url: url=https://raw.github.com/pypa/pip/master/contrib/get-pip.py dest=/home/{{ user }}
+  get_url: url=https://bootstrap.pypa.io/get-pip.py dest=/home/{{ user }}
 
 - name: Install pip new version.
   command: python get-pip.py
