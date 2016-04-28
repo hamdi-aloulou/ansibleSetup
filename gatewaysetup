@@ -1,0 +1,89 @@
+#!/bin/bash
+#ask if there is a raspberry set up wanna use it or not
+#if yes read the path to the file
+#if not clone and set the path value to the cloned repository
+#'cloning raspberry setup'
+#sudo git clone https://github.com/pawmint/raspberry_setup.git
+
+# after cloning it  we simply  run it
+# remove the set points
+
+until [ "$INSTALL" = "y" -o "$INSTALL" = "n" ]; do
+	read -r -p "Do you wish to install raspbian? (y/n)" INSTALL
+	INSTALL=`echo "$INSTALL" | tr '[:upper:]' '[:lower:]'`
+done
+if [ "$INSTALL" = "y" ]; then
+
+	until [ "$VAR" = "y" -o "$VAR" = "n" ]; do
+		read -r -p "Do want to clone the raspberry setup script? (Y/n) " VAR
+		VAR=`echo "$VAR" | tr '[:upper:]' '[:lower:]'`
+	done
+	echo $VAR
+	PAT=''
+	if [ "$VAR" = "y" ]; then
+		echo 'yes'
+		git clone  https://github.com/pawmint/raspberry_setup.git
+	else
+		echo 'no'
+		ok=1
+		until [ $ok = 0 ]; do
+			echo "ok is 0"
+			read -r -p "Type the absolute path the raspberry setup directory:" PAT
+			PAT=`echo "$PAT" | tr '[:upper:]' '[:lower:]'`
+			echo $PAT
+			ok=0	
+		done
+	fi
+	./$PAT/raspberry_setup/firmwareUpdate.sh
+fi
+media=$(df | awk '/media/ {print $6}')
+media=`echo "$media" | grep -e '[0-9]' | tr -s ' ' | cut -d ' ' -f 2`
+read -r -p "Type your network ESSID:" ESSID
+ESSID=`echo "$ESSID" | tr '[:upper:]' '[:lower:]'`
+read -r -p "Type your wifi password:" pass
+pass=`echo "$pass" | tr '[:upper:]' '[:lower:]'`
+
+echo "network={
+
+    ssid=”$ESSID”
+
+    psk=”$pass”
+
+    }" >> $media
+#run a nmap before asking to power on the pi
+
+nmap -sP 192.168.0.0/24 | grep ".192*" >  nmap1.tmp
+read -r -p 'Power on your raspberry pi then Press [Enter] key.' VAR
+sleep 30
+#ask if the card the the user whishs to use wifi or ethernet
+#if wifi run nmap add detect the new ip address
+
+#if ethernet rerun nmap
+#ask to connect the cable
+#reeun nmap and detect the ip address
+
+#once we have the ip adress run a ping to test the connection
+
+nmap -sP 192.168.0.0/24 | grep ".192*" >  nmap1.tmp
+IPADDRESS=`diff nmap1.tmp nmap2.tmp`
+IPADDRESS=`echo ${IPADDRESS:27}`
+
+    if [ -z "$IPADDRESS" ]; then
+        echo "Can't find your card."
+    else
+	echo $IPADDRESS
+     fi
+
+#ask if there is an ansibleset up wanna use it or not
+#if yes read the path to the file
+#if not clone and set the path value to the cloned repository
+#then add the ip address to the hosts file
+sed -i "s/192.168.0.101/${IPPADDRESS}/g" hosts
+#inactive rsakey or ssh_keygen
+#modify the ubigate branch
+#install ansible and run the necessarry steps
+apt-get insatall ansible
+pip install paramiko --upgrade
+ansible-playbook -vvv setup.yml -i hosts --ask-pass --sudo -c paramiko
+#if it was stopped state at what point it filed and at what point you wish to continue simple comment the achived steps
+
