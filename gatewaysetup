@@ -10,11 +10,11 @@
 #h1 'Raspbian installation'
 
 until [ "$INSTALL" = "y" -o "$INSTALL" = "n" ]; do
-	read -r -p "Is raspbian already installed on your SD card? (y/n)" INSTALL
+	read -r -p "Do you want to install a fresh Rasbian on your SD card? (y/n) " INSTALL
 	INSTALL=`echo "$INSTALL" | tr '[:upper:]' '[:lower:]'`
 done
 #Setting up the SD card
-if [ "$INSTALL" = "n" ]; then
+if [ "$INSTALL" = "y" ]; then
 #	PAT='' #path to the raspberry setup script
 #	until [ "$VAR" = "y" -o "$VAR" = "n" ]; do
 #		read -r -p "Do want to clone the raspberry setup script? (Y/n) " VAR
@@ -28,7 +28,7 @@ if [ "$INSTALL" = "n" ]; then
 #			read -r -p "Type the absolute path to the directory containing hte raspberrysetup repository(not the one containing the script)" PAT
 #			PAT=`echo "$PAT" | tr '[:upper:]' '[:lower:]'`
 #			echo $PAT
-#			ok=0	
+#			ok=0
 #		done
 #	fi
 	./firmwareUpdate.sh
@@ -36,30 +36,39 @@ fi
 #add mount command in firmwareUpdate script
 ###########################################################################################################
 #h1 'Ansible Script'
-until [ "$SD" = "y" ]; do
-        read -r -p "Is your SD card mounted? (y/n)" SD
-        SD=`echo "$SD" | tr '[:upper:]' '[:lower:]'`
+until [ "$WIFI" = "y" -o "$WIFI" = "n" ]; do
+    read -r -p "Do you want to configure your Raspberry PI WiFi (require RP3)? (y/n) " WIFI
+    WIFI=`echo "$WIFI" | tr '[:upper:]' '[:lower:]'`
 done
-#locating the sd card
-media=$(df | awk '/media/ {print $6}')
-#extracting the sd card's name
-media=`echo "$media" | grep -e '[0-9]' | tr -s ' ' | cut -d ' ' -f 2`
-#wifi configuration for model 3 raspberry pi
-media="$media/etc/wpa_supplicant/wpa_supplicant.conf"
-read -r -p "Type your network ESSID:" ESSID
-ESSID=`echo "$ESSID" | tr '[:upper:]' '[:lower:]'`
-read -r -p "Type your wifi password:" pass
-pass=`echo "$pass" | tr '[:upper:]' '[:lower:]'`
+#Setting up the SD card
+if [ "$WIFI" = "y" ]; then
 
-echo "network={
+    until [ "$SD" = "y" ]; do
+        read -r -p "Is your SD card mounted ? (y/n) " SD
+        SD=`echo "$SD" | tr '[:upper:]' '[:lower:]'`
+    done
+    #locating the sd card
+    media=$(df | awk '/media/ {print $6}')
+    #extracting the sd card's name
+    media=`echo "$media" | grep -e '[0-9]' | tr -s ' ' | cut -d ' ' -f 2`
+    #wifi configuration for model 3 raspberry pi
+    media="$media/etc/wpa_supplicant/wpa_supplicant.conf"
+    read -r -p "Type your network ESSID: " ESSID
+    ESSID=`echo "$ESSID" | tr '[:upper:]' '[:lower:]'`
+    read -r -p "Type your wifi password: " pass
+    pass=`echo "$pass" | tr '[:upper:]' '[:lower:]'`
 
-    ssid=”$ESSID”
+    echo "network={
 
-    psk=”$pass”
+        ssid=”$ESSID”
 
-    }" >> $media
+        psk=”$pass”
+
+        }" >> $media
+fi
 #running nmap before asking to power on the pi
 rm nmap*
+read -r -p 'Power off your raspberry pi then Press [Enter] key.' VAR
 nmap -sP 192.168.0.0/24 | grep ".192*" >  nmap1.tmp
 #Either connect it with an ethernet cable or use wifi not both at the same time
 #By running nmap twice, I am trying to identify the newly added Ip address
@@ -78,9 +87,12 @@ IPADDRESS=`echo ${IPADDRESS:27}`
      fi
 
 #adding the ip address to the hosts file
-sed -i "s/192.168.0.*/${IPADDRESS}/g" hosts
+echo $IPADDRESS >> hosts
+
+ssh-keygen -f ~/.ssh/known_hosts -R $IPADDRESS
 
 #install ansible and run the necessarry steps
+
 apt-get install ansible
 pip install paramiko --upgrade
 ansible-playbook -vvv setup.yml -i hosts --ask-pass --sudo -c paramiko
