@@ -36,11 +36,17 @@ fi
 #add mount command in firmwareUpdate script
 ###########################################################################################################
 #h1 'Ansible Script'
+until [ "$WIFI" = "y" -o "$WIFI" = "n" ]; do
+        read -r -p "Do you want to configure your wireless setup? (y/n)" WIFI
+        WIFI=`echo "$WIFI" | tr '[:upper:]' '[:lower:]'`
+done
+if [ "$WIFI" = "y" ]; then
+#locating the sd card
 until [ "$SD" = "y" ]; do
         read -r -p "Is your SD card mounted? (y/n)" SD
         SD=`echo "$SD" | tr '[:upper:]' '[:lower:]'`
 done
-#locating the sd card
+
 media=$(df | awk '/media/ {print $6}')
 #extracting the sd card's name
 media=`echo "$media" | grep -e '[0-9]' | tr -s ' ' | cut -d ' ' -f 2`
@@ -58,28 +64,31 @@ echo "network={
     psk=”$pass”
 
     }" >> $media
+fi
 #running nmap before asking to power on the pi
 rm nmap*
-nmap -sP 192.168.0.0/24 | grep ".192*" >  nmap1.tmp
+read -r -p 'Power off your raspberry pi then Press [Enter] key.' VAR
+nmap -sP 192.168.0.0/24 | grep -F "192" >  nmap1.tmp
 #Either connect it with an ethernet cable or use wifi not both at the same time
 #By running nmap twice, I am trying to identify the newly added Ip address
 read -r -p 'Power on your raspberry pi then Press [Enter] key.' VAR
 sleep 30
 
-nmap -sP 192.168.0.0/24 | grep ".192*" >  nmap2.tmp
+nmap -sP 192.168.0.0/24 | grep -F "192" >  nmap2.tmp
 
 IPADDRESS=`diff nmap1.tmp nmap2.tmp`
 IPADDRESS=`echo ${IPADDRESS:27}`
 #echo IPADDRESS=$IPADDRESS
     if [ -z "$IPADDRESS" ]; then
-        echo "Can't find your card."
+        echo "Can't find the raspberry."
+	read -r -p "Please type the ip address>" IPADDRESS
     else
 	echo ip=$IPADDRESS
      fi
 
 #adding the ip address to the hosts file
-sed -i "s/192.168.0.*/${IPADDRESS}/g" hosts
-
+#sed -i "s/192.168.0.*/${IPADDRESS}/g" hosts
+echo "$IPADDRESS" >> hosts
 #install ansible and run the necessarry steps
 apt-get install ansible
 pip install paramiko --upgrade
