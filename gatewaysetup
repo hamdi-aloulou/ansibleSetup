@@ -15,28 +15,31 @@ until [ "$INSTALL" = "y" -o "$INSTALL" = "n" ]; do
 done
 #Setting up the SD card
 if [ "$INSTALL" = "n" ]; then
-	PAT='' #path to the raspberry setup script
-	until [ "$VAR" = "y" -o "$VAR" = "n" ]; do
-		read -r -p "Do want to clone the raspberry setup script? (Y/n) " VAR
-		VAR=`echo "$VAR" | tr '[:upper:]' '[:lower:]'`
-	done
-	if [ "$VAR" = "y" ]; then
-		git clone  https://github.com/pawmint/raspberry_setup.git
-	else
-		ok=1
-		until [ $ok = 0 ]; do
-			read -r -p "Type the absolute path to the directory containing hte raspberrysetup repository(not the one containing the script)" PAT
-			PAT=`echo "$PAT" | tr '[:upper:]' '[:lower:]'`
-			echo $PAT
-			ok=0	
-		done
-	fi
-	./$PAT/raspberry_setup/firmwareUpdate.sh
+#	PAT='' #path to the raspberry setup script
+#	until [ "$VAR" = "y" -o "$VAR" = "n" ]; do
+#		read -r -p "Do want to clone the raspberry setup script? (Y/n) " VAR
+#		VAR=`echo "$VAR" | tr '[:upper:]' '[:lower:]'`
+#	done
+#	if [ "$VAR" = "y" ]; then
+#		git clone  https://github.com/pawmint/raspberry_setup.git
+#	else
+#		ok=1
+#		until [ $ok = 0 ]; do
+#			read -r -p "Type the absolute path to the directory containing hte raspberrysetup repository(not the one containing the script)" PAT
+#			PAT=`echo "$PAT" | tr '[:upper:]' '[:lower:]'`
+#			echo $PAT
+#			ok=0	
+#		done
+#	fi
+	./firmwareUpdate.sh
 fi
 #add mount command in firmwareUpdate script
 ###########################################################################################################
 h1 'Ansible Script'
-echo "make sure your SD card is mounted"
+until [ "$SD" = "y" ]; do
+        read -r -p "Is your SD card mounted? (y/n)" SD
+        SD=`echo "$SD" | tr '[:upper:]' '[:lower:]'`
+done
 #locating the sd card
 media=$(df | awk '/media/ {print $6}')
 #extracting the sd card's name
