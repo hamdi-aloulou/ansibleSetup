@@ -10,11 +10,12 @@
 #h1 'Raspbian installation'
 
 until [ "$INSTALL" = "y" -o "$INSTALL" = "n" ]; do
-	read -r -p "Is raspbian already installed on your SD card? (y/n)" INSTALL
+	read -r -p "Do you want to install a fresh Rasbian on your SD card? (y/n) " INSTALL
 	INSTALL=`echo "$INSTALL" | tr '[:upper:]' '[:lower:]'`
 done
 #Setting up the SD card
-if [ "$INSTALL" = "n" ]; then
+if [ "$INSTALL" = "y" ]; then
+#Setting up the SD card
 #	PAT='' #path to the raspberry setup script
 #	until [ "$VAR" = "y" -o "$VAR" = "n" ]; do
 #		read -r -p "Do want to clone the raspberry setup script? (Y/n) " VAR
@@ -37,7 +38,7 @@ fi
 ###########################################################################################################
 #h1 'Ansible Script'
 until [ "$WIFI" = "y" -o "$WIFI" = "n" ]; do
-        read -r -p "Do you want to configure your wireless setup? (y/n)" WIFI
+        read -r -p "Do you want to configure your Raspberry PI Wifi (require RP3)? (y/n)" WIFI
         WIFI=`echo "$WIFI" | tr '[:upper:]' '[:lower:]'`
 done
 if [ "$WIFI" = "y" ]; then
@@ -88,7 +89,9 @@ IPADDRESS=`echo ${IPADDRESS:27}`
 
 #adding the ip address to the hosts file
 #sed -i "s/192.168.0.*/${IPADDRESS}/g" hosts
-echo "$IPADDRESS" >> hosts
+echo $IPADDRESS >> hosts
+
+ssh-keygen -f ~/.ssh/known_hosts -R $IPADDRESS
 #install ansible and run the necessarry steps
 apt-get install ansible
 pip install paramiko --upgrade
