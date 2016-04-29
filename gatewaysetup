@@ -67,7 +67,6 @@ echo "network={
     }" >> $media
 fi
 #running nmap before asking to power on the pi
-rm nmap*
 read -r -p 'Power off your raspberry pi then Press [Enter] key.' VAR
 nmap -sP 192.168.0.0/24 | grep -F "192" >  nmap1.tmp
 #Either connect it with an ethernet cable or use wifi not both at the same time
@@ -89,8 +88,13 @@ IPADDRESS=`echo ${IPADDRESS:27}`
 
 #adding the ip address to the hosts file
 #sed -i "s/192.168.0.*/${IPADDRESS}/g" hosts
+if grep -Fxq "$IPADDRESS" hosts
+then
+continue
+else
 echo $IPADDRESS >> hosts
-
+fi
+rm nmap*
 ssh-keygen -f ~/.ssh/known_hosts -R $IPADDRESS
 #install ansible and run the necessarry steps
 apt-get install ansible
