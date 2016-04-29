@@ -7,7 +7,7 @@
 # after cloning it  we simply  run it
 # remove the set points
 ##############################################################################################################
-h1 'Raspbian installation'
+#h1 'Raspbian installation'
 
 until [ "$INSTALL" = "y" -o "$INSTALL" = "n" ]; do
 	read -r -p "Is raspbian already installed on your SD card? (y/n)" INSTALL
@@ -35,7 +35,7 @@ if [ "$INSTALL" = "n" ]; then
 fi
 #add mount command in firmwareUpdate script
 ###########################################################################################################
-h1 'Ansible Script'
+#h1 'Ansible Script'
 until [ "$SD" = "y" ]; do
         read -r -p "Is your SD card mounted? (y/n)" SD
         SD=`echo "$SD" | tr '[:upper:]' '[:lower:]'`
