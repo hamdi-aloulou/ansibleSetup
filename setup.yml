@@ -9,5 +9,6 @@
     - oh-my-zsh
     - mochad
     - ubigate
+#   - ansible
   remote_user: pi
   sudo: yes

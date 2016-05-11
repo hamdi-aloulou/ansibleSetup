@@ -15,8 +15,3 @@
 # repo must contain a local.yml file at top level
 #repo_url: git://github.com/sfromm/ansible-playbooks.git
     repo_url:  git@github.com:pawmint/ubiGATE.git
-
-#branch to checkout
-    checkout:   test
-user: pi
-mochad_version: 0.1.16
