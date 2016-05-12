@@ -3,7 +3,7 @@
     schedule: '*1* * * '
 
 # User to run ansible-pull as from cron
-    cron_user:root
+    cron_user: root
 
 # File that ansible will use for logs
     logfile: /var/log/ansible-pull.log
@@ -14,9 +14,9 @@
 # Repository to check out -- YOU MUST CHANGE THIS
 # repo must contain a local.yml file at top level
 #repo_url: git://github.com/sfromm/ansible-playbooks.git
-    repo_url:  git@github.com:pawmint/ubiGATE.git
+    repo_url: git@github.com:pawmint/ubiGATE.git
 
 #branch to checkout
-    checkout:   test
-user: pi
-mochad_version: 0.1.16
+    checkout: test
+    user: pi
+#mochad_version: 0.1.16
