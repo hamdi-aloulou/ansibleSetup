@@ -9,7 +9,7 @@
     logfile: /var/log/ansible-pull.log
 
 # Directory to where repository will be cloned
-    workdir: /home/pi/
+    workdir: /home/pi/ubigate
 
 # Repository to check out -- YOU MUST CHANGE THIS
 # repo must contain a local.yml file at top level
