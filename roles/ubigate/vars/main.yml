@@ -1,6 +1,6 @@
 ---
 # schedule is fed directly to cron
-    schedule: '*1* * * '
+    schedule: '*/10 * * * * '
 
 # User to run ansible-pull as from cron
     cron_user: root
