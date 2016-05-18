@@ -1,0 +1,3 @@
+# Cron job to git clone/pull a repo and then run locally
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/home/pi
+{{ schedule }} {{ cron_user }}  /home/pi/oh_my_zsh.sh >>{{ logfile }} 2>&1

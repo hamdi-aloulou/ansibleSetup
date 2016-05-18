@@ -1,0 +1,54 @@
+---
+
+- name: Updating from Raspberry PI
+  user: pi
+  sudo: yes
+  hosts: localhost
+
+  tasks:
+
+  - name: Let's update the apt cache.
+    apt: update_cache=yes
+
+  - name: Now we need to update the Raspbian distribution.
+    apt: upgrade=yes
+    
+  - name: Make sure some basic tools are installed
+    apt: pkg={{ item }} state=latest
+    with_items:
+     - apt-transport-https
+     - apticron
+     - build-essential
+     - debian-goodies
+     - unattended-upgrades
+     - git
+     - curl
+     - htop
+     - iftop
+     - iotop
+     - nmap
+     - tmux
+     - zsh
+     - nmon
+     - rpi-update
+     - haveged
+     - avahi-daemon
+     - rng-tools
+     - vim
+     - mosh
+     - python-software-properties
+     - ruby1.9.3
+     - screen
+     - sudo
+     - update-notifier-common
+    
+  - name: Autoremove any unused packages.
+    shell: "apt-get autoremove --assume-yes --purge"
+
+  - name: Let's Autoclean the system.
+    shell: "apt-get autoclean --assume-yes"
+  
+  - name: Updating oh-my-zsh.
+    shell: "sh /home/pi/.oh_my_zsh/tools/upgrade.sh"
+
+
