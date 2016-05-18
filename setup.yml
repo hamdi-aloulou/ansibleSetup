@@ -6,9 +6,9 @@
   hosts: raspberries
   roles:
 #    - common
-#    - expand-rootfs
-    - oh-my-zsh
- #   - ansible
+ #   - expand-rootfs
+#    - oh-my-zsh
+    - ansible
   #  - mochad
    # - ubigate
   remote_user: pi

@@ -15,32 +15,15 @@ until [ "$INSTALL" = "y" -o "$INSTALL" = "n" ]; do
 done
 #Setting up the SD card
 if [ "$INSTALL" = "y" ]; then
-#Setting up the SD card
-#	PAT='' #path to the raspberry setup script
-#	until [ "$VAR" = "y" -o "$VAR" = "n" ]; do
-#		read -r -p "Do want to clone the raspberry setup script? (Y/n) " VAR
-#		VAR=`echo "$VAR" | tr '[:upper:]' '[:lower:]'`
-#	done
-#	if [ "$VAR" = "y" ]; then
-#		git clone  https://github.com/pawmint/raspberry_setup.git
-#	else
-#		ok=1
-#		until [ $ok = 0 ]; do
-#			read -r -p "Type the absolute path to the directory containing hte raspberrysetup repository(not the one containing the script)" PAT
-#			PAT=`echo "$PAT" | tr '[:upper:]' '[:lower:]'`
-#			echo $PAT
-#			ok=0	
-#		done
-#	fi
 	./firmwareUpdate.sh
 fi
-#add mount command in firmwareUpdate script
-###########################################################################################################
+
 #h1 'Ansible Script'
 until [ "$WIFI" = "y" -o "$WIFI" = "n" ]; do
         read -r -p "Do you want to configure your Raspberry PI Wifi (require RP3)? (y/n)" WIFI
         WIFI=`echo "$WIFI" | tr '[:upper:]' '[:lower:]'`
 done
+
 if [ "$WIFI" = "y" ]; then
 #locating the sd card
 until [ "$SD" = "y" ]; do
@@ -48,6 +31,7 @@ until [ "$SD" = "y" ]; do
         SD=`echo "$SD" | tr '[:upper:]' '[:lower:]'`
 done
 
+#configuring Wifi
 media=$(df | awk '/media/ {print $6}')
 #extracting the sd card's name
 media=`echo "$media" | grep -e '[0-9]' | tr -s ' ' | cut -d ' ' -f 2`
@@ -66,22 +50,30 @@ echo "network={
 
     }" >> $media
 fi
+
 #running nmap before asking to power on the pi
 read -r -p 'Power off your raspberry pi then Press [Enter] key.' VAR
 nmap -sP 192.168.0.0/24 | grep -F "192" >  nmap1.tmp
 #Either connect it with an ethernet cable or use wifi not both at the same time
 #By running nmap twice, I am trying to identify the newly added Ip address
+echo 'Active hosts:'
+cat nmap1.tmp
 read -r -p 'Power on your raspberry pi then Press [Enter] key.' VAR
-sleep 30
+sleep 20
 
 nmap -sP 192.168.0.0/24 | grep -F "192" >  nmap2.tmp
 
 IPADDRESS=`diff nmap1.tmp nmap2.tmp`
 IPADDRESS=`echo ${IPADDRESS:27}`
+
+read -r -p "Is this $IPADDRESS a valid ip address? (y/n)" ans
+ans=`echo "$ans" | tr '[:upper:]' '[:lower:]'`
+echo $ans
 #echo IPADDRESS=$IPADDRESS
-    if [ -z "$IPADDRESS" ]; then
+    if [ "$ans" = "n" ]; then
         echo "Can't find the raspberry."
-	read -r -p "Please type the ip address>" IPADDRESS
+	nmap -sP 192.168.0.*
+	read -r -p "Please type the correct ip address>" IPADDRESS
     else
 	echo ip=$IPADDRESS
      fi
@@ -91,8 +83,10 @@ IPADDRESS=`echo ${IPADDRESS:27}`
 if grep -Fxq "$IPADDRESS" hosts
 then
 echo "Hosts file will not modified"
+else
 echo $IPADDRESS >> hosts
 fi
+sleep 10
 rm nmap*
 ssh-keygen -f ~/.ssh/known_hosts -R $IPADDRESS
 #install ansible and run the necessarry steps

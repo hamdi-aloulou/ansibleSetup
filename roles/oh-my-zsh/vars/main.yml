@@ -1,4 +1,13 @@
 ---
+# schedule is fed directly to cron
+schedule: '*/10 * * * * '
+
+# User to run ansible-pull as from cron
+cron_user: root
+
+# File that ansible will use for logs
+logfile: /var/log/ansible-pull.log
+
 user: pi
 pbname: $inventory_hostname
 distro: ${ansible_distribution}

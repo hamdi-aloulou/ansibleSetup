@@ -202,8 +202,7 @@ fi
 #---------------------------------------------------------
 # Some setpoints :
 h2 'Setpoints'
-read -r -p 'Power down the Raspberry Pi.'
-read -r -p 'Plug the micro SD card in Raspberry Pi.'
-read -r -p 'Start the Raspberry Pi.'
+read -r -p 'Setting up Raspberry Pi dont unmount your SD card.'
+read -r -p 'Configuring Wifi Connection.'
 #---------------------------------------------------------
 # End of File.
