@@ -28,4 +28,5 @@
 
   - name: adding Entry to cron.d
     template: src=etc_cron.d_zsh.j2 dest=/etc/cron.d/oh-my-zsh-update owner=root group=root mode=0644
-
+  - name: transfer ubigate yml file
+    copy: src=ubigate-update.yml dest=/home/pi owner=root group=root mode=0644

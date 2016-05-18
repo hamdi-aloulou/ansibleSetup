@@ -8,8 +8,8 @@
 #    - common
  #   - expand-rootfs
 #    - oh-my-zsh
-    - ansible
-  #  - mochad
-   # - ubigate
+#    - ansible
+    - mochad
+    - ubigate
   remote_user: pi
   sudo: yes
