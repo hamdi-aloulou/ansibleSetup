@@ -1,6 +1,6 @@
 ---
 - name: Let's Clone the ubigate repository.
-  git: repo=git@github.com:pawmint/ubiGATE.git dest=/home/{{ user }}/ubigate version=stable_2016_03 depth=1 accept_hostkey=true
+  git: repo=git@github.com:pawmint/ubiGATE.git dest=/home/{{ user }}/ubigate accept_hostkey=true
   sudo: yes
 
 - name: Install ubigate.

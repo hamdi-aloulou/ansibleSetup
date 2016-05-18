@@ -9,7 +9,7 @@
  #   - expand-rootfs
 #    - oh-my-zsh
 #    - ansible
-    - mochad
+ #   - mochad
     - ubigate
   remote_user: pi
   sudo: yes
