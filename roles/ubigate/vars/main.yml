@@ -22,4 +22,4 @@ repo_url: git@github.com:pawmint/ubiGATE.git
 #Playbook file
 file_name: /home/pi/ubigate-update.yml
 #branch to checkout
-#    checkout: test
+checkout: stable_2016_03
