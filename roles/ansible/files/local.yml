@@ -47,8 +47,3 @@
 
   - name: Let's Autoclean the system.
     shell: "apt-get autoclean --assume-yes"
-  
-  - name: Updating oh-my-zsh.
-    shell: "sh /home/pi/.oh_my_zsh/tools/upgrade.sh"
-
-

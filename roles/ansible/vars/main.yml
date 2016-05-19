@@ -1,17 +1,30 @@
 ---
 # schedule is fed directly to cron
-    schedule: '* * * * * '
+    schedule: '*/5 * * * * '
 
 # User to run ansible-pull as from cron
     cron_user: root
 
-# File that ansible will use for logs
-    logfile: /var/log/oh-my-zsh-update.log
+# File that ansible will use for logs when updating packages
+    logfile_updates: /var/log/updates.log
 
-# Directory to where repository will be cloned
+# File that ansible will use for logs when updating zsh
+    logfile_zsh: /var/log/oh-my-zsh-update.log
+
+# File that ansible will use for logs when updating ubigate
+    logfile_ubg: /var/log/ubigate-update.log
+
+# Directory to where ubigate will be cloned
+    workdir_ubg: /home/pi/ubigate
+
+# Directory to where other files will be stored
     workdir: /home/pi/ansible
 
 # Repository to check out -- YOU MUST CHANGE THIS
-# repo must contain a local.yml file at top level
-#repo_url: git://github.com/sfromm/ansible-playbooks.git
-   # repo_url:  git@github.com:pawmint/ubiGATE.git
+    repo_url_ubg:  git@github.com:pawmint/ubiGATE.git
+
+#ubigate branch to checkout
+    checkout_ubg: stable_2016_03
+
+#ubigate Playbook file
+    file_name_ubg: /home/pi/ansible/ubigate-update.yml

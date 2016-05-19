@@ -1,0 +1,4 @@
+# Cron job to git clone/pull a repo and then run locally
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+{{ schedule }} {{ cron_user }} ansible-playbook -i "localhost," -c local /home/pi/ansible/local.yml >>{{ logfile_updates }} 2>&1
+
