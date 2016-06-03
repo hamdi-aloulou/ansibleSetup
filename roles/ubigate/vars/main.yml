@@ -1,6 +1,6 @@
 ---
 user: pi
 mochad_version: 0.1.16
-#ubiserver: https://tib.ubismart.org/
+#ubiserver: https://tib.ubismart.org
 ubigate: "'ubigate -s"
 debug: "-L debug -l debug --no-verify-ssl'"

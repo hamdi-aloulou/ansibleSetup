@@ -17,6 +17,3 @@
   with_items:
     - enable
     - start
-
-#- name: adding entry to cron.d
- # template: src=etc_cron.d_ubigate_update.j2 dest=/etc/cron.d/ubigate-update owner=root group=root mode=0644
