@@ -10,7 +10,7 @@
   command: ubigate-plugin-manager install https://github.com/pawmint/marmitek-gw/ --branch=dev
 
 - name: Copy ubigate systemd service
-  copy: src=ubigate.service dest=/lib/systemd/system/
+  template: src=ubigate_service.j2 dest=/lib/systemd/system/ubigate.service mode=0777
 
 - name: enable ubigate systemd service
   command: sudo systemctl {{ item }} ubigate.service

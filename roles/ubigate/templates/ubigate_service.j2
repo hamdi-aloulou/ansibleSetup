@@ -1,11 +1,10 @@
+#ubigate service
 [Unit]
 Description=Run ubigate as a Daemon
 After=syslog.target network.target
 
 [Service]
-# Type=forking
-# GuessMainPID=yes
-ExecStart=/bin/bash -c 'ubigate -s https://tib.ubismart.org -L debug -l debug --no-verify-ssl'
+ExecStart=/bin/bash -c {{ ubigate }} {{ ubiserver }} {{ debug }}
 Restart=on-failure
 RestartSec=5
 
