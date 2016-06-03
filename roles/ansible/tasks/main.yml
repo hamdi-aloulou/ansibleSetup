@@ -6,21 +6,18 @@
   - name: Create local directory to work from
     file: path={{workdir}} state=directory owner=root group=root mode=0755
 
-  - name: Copy ansible inventory file to client
-    copy: src=/etc/ansible/hosts dest=/etc/ansible/hosts owner=root group=root mode=0644
+#  - name: Copy ansible inventory file to client
+ #   copy: src=/etc/ansible/hosts dest=/etc/ansible/hosts owner=root group=root mode=0644
 
-  - name: Transfer the script
-    copy: src=hosts.sh dest={{workdir}} mode=0777
+  #- name: Transfer the script
+ #   copy: src=hosts.sh dest={{workdir}} mode=0777
 
-  - name: Adding localhost to hosts
-    command: sh /home/pi/ansible/hosts.sh
+  #- name: Adding localhost to hosts
+  #  command: sh /home/pi/ansible/hosts.sh
 
 # updating the OS at 4 am each day
   - name: apt-get update & upgrade
     apt: pkg=cron-apt state=installed
-
-  - name: Create logrotate entry for ansible-pull.log
-    template: src=etc_logrotate.d_ansible-pull.j2 dest=/etc/logrotate.d/ansible-pull owner=root group=root mode=0644
  
   - name: Transfer zsh script
     copy: src=oh_my_zsh.sh dest={{workdir}} mode=0777
@@ -28,11 +25,17 @@
   - name: adding zsh Entry to cron.d
     template: src=etc_cron.d_zsh.j2 dest=/etc/cron.d/oh-my-zsh-update owner=root group=root mode=0644
 
+  - name: Create logrotate entry for oh-my-zsh-update.log
+    template: src=etc_logrotate.d_oh-my-zsh-update.j2 dest=/etc/logrotate.d/oh-my-zsh-update owner=root group=root mode=0644
+  
   - name: transfer ubigate yml file
     copy: src=ubigate-update.yml dest={{workdir}} owner=root group=root mode=0644
 
   - name: adding ubigate update  entry to cron.d
     template: src=etc_cron.d_ubigate_update.j2 dest=/etc/cron.d/ubigate-update owner=root group=root mode=0644
+  
+  - name: Create logrotate entry for ansible-pull.log
+    template: src=etc_logrotate.d_ubigate-update.j2 dest=/etc/logrotate.d/ubigate-update owner=root group=root mode=0644
   
   - name: Transfer local yml script
     copy: src=local.yml dest={{workdir}} mode=0777
@@ -40,4 +43,5 @@
   - name: adding local yml entry to cron.d
     template: src=etc_cron.d_updates.j2 dest=/etc/cron.d/updates owner=root group=root mode=0644
 
-
+  - name: Create logrotate entry for ansible-pull.log
+    template: src=etc_logrotate.d_updates.j2 dest=/etc/logrotate.d/updates owner=root group=root mode=0644
