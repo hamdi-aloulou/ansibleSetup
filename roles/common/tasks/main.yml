@@ -1,4 +1,8 @@
 ---
+- name: Let's update the apt cache.
+  apt: update_cache=yes
+  sudo: yes
+
 - name: Remove unneeded packages.
   apt:
     name: "{{ item }}"
@@ -43,9 +47,6 @@
     - /usr/share/icons/gnome/icon-theme.cache
     - /opt/vc/src/hello_pi/hello_video/test.h264
 
-- name: Let's update the apt cache.
-  apt: update_cache=yes
-  sudo: yes
 
 - name: Now we need to update the Raspbian distribution.
   apt: upgrade=yes
