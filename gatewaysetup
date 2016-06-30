@@ -19,92 +19,123 @@ if [ "$INSTALL" = "y" ]; then
 fi
 
 #h1 'Ansible Script'
+#h1 'Ansible Script'
 until [ "$WIFI" = "y" -o "$WIFI" = "n" ]; do
-        read -r -p "Do you want to configure your Raspberry PI Wifi (require RP3)? (y/n)" WIFI
-        WIFI=`echo "$WIFI" | tr '[:upper:]' '[:lower:]'`
+    read -r -p "Do you want to configure your Raspberry PI Wifi (require RP3)? (y/n)" WIFI
+    WIFI=`echo "$WIFI" | tr '[:upper:]' '[:lower:]'`
 done
-
 if [ "$WIFI" = "y" ]; then
-#locating the sd card
-until [ "$SD" = "y" ]; do
+    until [ "$SD" = "y" ]; do
         read -r -p "Is your SD card mounted? (y/n)" SD
         SD=`echo "$SD" | tr '[:upper:]' '[:lower:]'`
-done
-
-#configuring Wifi
-media=$(df | awk '/media/ {print $6}')
-#extracting the sd card's name
-media=`echo "$media" | grep -e '[0-9]' | tr -s ' ' | cut -d ' ' -f 2`
+    done
+    media_s=$(df | awk '/media/ {print $6}')
+    echo $media_s
+    media=`echo "$media_s" | grep -e '[0-9]' | tr -s ' ' | cut -d ' ' -f 2`
+    if [ -z "$media" ]; then
+	media=`echo "$media_s" | grep -e 'root' ` 
+    fi
+    if [ -z "$media" ]; then
+	read -r -p "Failure to locate your SD card press [enter] key to skip this task>" SD
+    else
 #wifi configuration for model 3 raspberry pi
-media="$media/etc/wpa_supplicant/wpa_supplicant.conf"
-read -r -p "Type your network ESSID:" ESSID
-ESSID=`echo "$ESSID" | tr '[:upper:]' '[:lower:]'`
-read -r -p "Type your wifi password:" pass
-pass=`echo "$pass" | tr '[:upper:]' '[:lower:]'`
-
-echo "network={
-
-    ssid=”$ESSID”
-
-    psk=”$pass”
-
-    }" >> $media
+        media="$media/etc/wpa_supplicant/wpa_supplicant.conf"
+        echo $media
+        read -r -p "Type your network ESSID:" ESSID
+        ESSID=`echo "$ESSID" | tr '[:upper:]' '[:lower:]'`
+        read -r -p "Type your wifi password:" pass
+        pass=`echo "$pass" | tr '[:upper:]' '[:lower:]'`
+	echo "country=GB
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+network={
+ssid=\""$ESSID"\"
+psk=\""$pass"\"
+}" > $media
+    fi
 fi
-until [ "$HOSTS" = "y" -o "$HOSTS" = "n" ]; do
-        read -r -p "Do you have a ready hosts file? (y/n)" HOSTS
-        HOSTS=`echo "$HOSTS" | tr '[:upper:]' '[:lower:]'`
-done
 
-if [ "$HOSTS" = "n" ]; then
-echo 'Generating a hosts file...'
-#running nmap before asking to power on the pi
 read -r -p 'Power off your raspberry pi then Press [Enter] key.' VAR
-nmap -sP 192.168.0.0/24 | grep -F "192" >  nmap1.tmp
-#Either connect it with an ethernet cable or use wifi not both at the same time
-#By running nmap twice, I am trying to identify the newly added Ip address
+nmap -sP 192.168.0.0/24 | grep -F "report" >  nmap1.tmp
 echo 'Active hosts:'
 cat nmap1.tmp
 read -r -p 'Power on your raspberry pi then Press [Enter] key.' VAR
 sleep 20
+nmap -sP 192.168.0.0/24 | grep -F "report" >  nmap2.tmp
+echo 'Now Active hosts are:' 
+cat nmap2.tmp
+grep -v -x -f nmap1.tmp nmap2.tmp > new.tmp
+while IFS='' read -r line || [[ -n "$line" ]]; do
+    line=`echo ${line:21}`
+    echo "$line" >> ip.tmp
+done < new.tmp
+#delete nmap1 nmap2 and new
 
-nmap -sP 192.168.0.0/24 | grep -F "192" >  nmap2.tmp
-
-IPADDRESS=`diff nmap1.tmp nmap2.tmp`
-IPADDRESS=`echo ${IPADDRESS:27}`
-
-read -r -p "Is this $IPADDRESS a valid ip address? (y/n)" ans
-ans=`echo "$ans" | tr '[:upper:]' '[:lower:]'`
-echo $ans
-#echo IPADDRESS=$IPADDRESS
-
+if [ ! -s new.tmp ] ; then
+    echo "No IP address detected"
+    VAR=0;
+else
+    echo "we deteted these ips:"
+    cat ip.tmp
+    read -r -p "Is/Are this/these newly detected ip address? (y/n)" ans
+    ans=`echo "$ans" | tr '[:upper:]' '[:lower:]'`
     if [ "$ans" = "n" ]; then
-        echo "Can't find the raspberry."
-	until [[ $IPADDRESS =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; do
-	nmap -sP 192.168.0.*
-	read -r -p "Please type the correct ip address>" IPADDRESS
-	done
+        VAR=0;
     else
-	echo ip=$IPADDRESS
-     fi
-read -r -p "Type Ubismart server url address: " address
-address=`echo "$ans" | tr '[:upper:]' '[:lower:]'`
-IPADDRESS="$IPADDRESS ubiserver=$address"
+	VAR=1;
+    fi
+fi
+rm  nmap1.tmp
+rm nmap2.tmp
+rm new.tmp
+while [ $VAR -eq 0 ]; do
+    echo "Can't find the raspberry."
+    echo "Enter an IP address:"
+    read IP_ADDRESS
+    if echo "$IP_ADDRESS" | egrep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
+    then
+    # Then the format looks right - check that each octect is less
+    # than or equal to 255:
+        VALID_IP_ADDRESS="$(echo $IP_ADDRESS | awk -F'.' '$1 <=255 && $2 <= 255 && $3 <= 255 && $4 <= 255')"
+        if [ -z "$VALID_IP_ADDRESS" ]
+        then
+            echo "The IP address wasn't valid; octets must be less than 256"
+        else
+            echo "The IP address was valid"
+            echo $IP_ADDRESS > ip.tmp
+            read -r -p "Have you finished ? (y/n)" ans
+            ans=`echo "$ans" | tr '[:upper:]' '[:lower:]'`
+            if [ "$ans" = "y" ]; then
+                VAR=1;
+            fi
+        fi
+    else
+	echo "The IP address was malformed"
+    fi
+done
+echo "Remote hosts to configure:" 
+cat ip.tmp
+read -r -p "We're about to generate hosts file for ansible.Do you want to continue? (y/n) " CONT
+CONT=`echo "$CONT" | tr '[:upper:]' '[:lower:]'`
+if [ "$CONT" = "y" ]; then
+    echo "[raspberries]" > hosts
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        ssh-keygen -f ~/.ssh/known_hosts -R $line
+        echo "$line" >> hosts
+    done < ip.tmp
+    rm ip.tmp
+    echo "[raspberries:vars]" >> hosts
+    read -r -p "Enter ubismart url address example: <tib.ubismart.org> > " ans
+    ans=`echo "$ans" | tr '[:upper:]' '[:lower:]'`
+    echo  "ubiserver=https://$ans" >> hosts
+    echo "this is your hosts file:"
+    cat hosts
+    sleep 5
+else
+    read -r -p 'Place your hosts file in the current directory then Press [Enter] key.' VAR
+    rm ip.tmp
+fi
 
-#adding the ip address to the hosts file
-#sed -i "s/192.168.0.*/${IPADDRESS}/g" hosts
-if grep -Fxq "$IPADDRESS" hosts
-then
-echo "Hosts file will not be modified"
-else
-echo $IPADDRESS >> hosts
-fi
-sleep 2
-rm nmap*
-else
-	echo 'make sure the hosts file is in the current directory'
-	sleep 10
-fi
-ssh-keygen -f ~/.ssh/known_hosts -R $IPADDRESS
 #install ansible and run the necessarry steps
 apt-get install ansible
 pip install paramiko --upgrade
