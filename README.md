@@ -6,7 +6,7 @@
 
 # Changing UbiServer (system already installed)
 
-1. ssh pi@<IP-Raspberry>
+1. ssh into the RaspberryPi
 2. sudo vim /lib/systemd/system/ubigate.service
 3. sudo systemclt daemon-reload
 4. sudo systemctl restart ubigate
