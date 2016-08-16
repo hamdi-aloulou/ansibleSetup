@@ -8,5 +8,5 @@
 
 1. ssh into the RaspberryPi
 2. sudo vim /lib/systemd/system/ubigate.service
-3. sudo systemclt daemon-reload
+3. sudo systemctl daemon-reload
 4. sudo systemctl restart ubigate
