@@ -1,13 +1,13 @@
 ---
 - name: Let's Clone the ubigate repository.
-  git: repo=git@github.com:pawmint/ubiGATE.git dest=/home/{{ user }}/ubigate version=stable_2016_03 depth=1 accept_hostkey=true  
+  git: repo=git@github.com:pawmint/ubiGATE.git dest=/home/{{ user }}/ubigate version=OM_format_data depth=1 accept_hostkey=true
   sudo: yes
 
 - name: Install ubigate.
   command: python setup.py install chdir="/home/{{ user }}/ubigate"
 
 - name: Install marmitek plugin.
-  command: ubigate-plugin-manager install https://github.com/pawmint/marmitek-gw/ --branch=dev
+  command: ubigate-plugin-manager install https://github.com/pawmint/marmitek-gw/ --branch=dev_clone
 
 - name: Copy ubigate systemd service
   template: src=ubigate.service dest=/lib/systemd/system/
