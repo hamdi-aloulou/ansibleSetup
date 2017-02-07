@@ -25,3 +25,14 @@ sudo rm /root/.config/ubigate/credentials.json
 # Let the modification take effect
 sudo systemctl restart ubigate
 ```
+
+With SensorML, existing xml files seem to prevent the reception of configuration file (config.json)
+
+```
+# Remove XML files
+rm ~/*.xml
+
+# Let the modification take effect
+sudo systemctl restart ubigate
+```
+To get the `config.json`, in web-interface of UbiSmart, go to _homedesc_ of the house and click on Submit.
