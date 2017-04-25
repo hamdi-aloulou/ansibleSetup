@@ -41,5 +41,5 @@ To get the `config.json`, in web-interface of UbiSmart, go to _homedesc_ of the 
 
 Since 25/11/2016, SSH is disabled by default on Raspberry. In order to activate ssh, two options are available.
  - through raspi-config or the application Raspberry Pi Configuration (this requires a screen and a keyboard)
- - by addding an SSH file to the boot particiption on the SD card (just plug the SD card to your computer and you will be able to access the boot particitioin). The SSH file can be empty or contain any text. When the Raspberry Pi starts, it looks for that file. If it finds it, it activates SSH and then deletes the file.
+ - by addding a file named SSH to the boot particiption of the SD card (just plug the SD card to your computer and you will be able to access the boot particition). The SSH file can be empty or contain any text. When the Raspberry Pi starts, it looks for that file. If it finds it, it activates SSH and then deletes the file.
  
